@@ -1,6 +1,6 @@
 ﻿namespace VerificationServiceProvider.Models;
 
-public class VerificationCode
+public class VerificationCodeModel
 {
     public string Email { get; set; } = null!;
     public string Code { get; set; } = null!;
