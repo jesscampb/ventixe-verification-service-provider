@@ -24,7 +24,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Data\Contexts\" />
     <Folder Include="Data\Entities\" />
   </ItemGroup>
 </Project>
