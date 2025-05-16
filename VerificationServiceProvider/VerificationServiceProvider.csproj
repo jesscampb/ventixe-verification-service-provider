@@ -17,6 +17,5 @@
   <ItemGroup>
     <Folder Include="Data\Contexts\" />
     <Folder Include="Data\Entities\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 </Project>
