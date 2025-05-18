@@ -1,4 +1,5 @@
-﻿using VerificationServiceProvider.Data.Contexts;
+﻿using Microsoft.EntityFrameworkCore;
+using VerificationServiceProvider.Data.Contexts;
 using VerificationServiceProvider.Models;
 
 namespace VerificationServiceProvider.Services;
@@ -53,5 +54,23 @@ public class VerificationService(VerificationDbContext context)
         }
 
         return null!;
+    }
+
+    public async Task<bool> ValidateVerificationCodeAsync(ValidateRequestModel? validateRequest)
+    {
+        var entity = await _context.VerificationCodes.FirstOrDefaultAsync(x =>
+            x.Email == validateRequest!.Email &&
+            x.Code == validateRequest!.Code &&
+            x.ExpiresAt > DateTime.UtcNow
+        );
+
+        if (entity != null)
+        {
+            _context.Remove(entity);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        return false;
     }
 }
