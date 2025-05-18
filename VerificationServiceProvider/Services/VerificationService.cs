@@ -1,10 +1,12 @@
-﻿using VerificationServiceProvider.Models;
+﻿using VerificationServiceProvider.Data.Contexts;
+using VerificationServiceProvider.Models;
 
 namespace VerificationServiceProvider.Services;
 
-public class VerificationService
+public class VerificationService(VerificationDbContext context)
 {
     private static readonly Random _random = new();
+    private readonly VerificationDbContext _context = context;
 
     public static VerificationCodeModel GenerateVerificationCode(string email, int expiresInMinutes = 5)
     {
@@ -16,5 +18,19 @@ public class VerificationService
         };
 
         return verificationCode;
+    }
+
+    public async Task<bool> SaveVerificationCodeAsync(VerificationCodeModel verificationCode)
+    {
+        try
+        {
+            _context.Add(verificationCode);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 }
