@@ -14,6 +14,8 @@ public class GenerateVerificationCode(ILogger<GenerateVerificationCode> logger, 
     private readonly VerificationService _verificationService = verificationService;
 
     [Function(nameof(GenerateVerificationCode))]
+    [ServiceBusOutput("verification-email-requested", Connection = "ServiceBusConnection")]
+
     public async Task<string?> Run(
         [ServiceBusTrigger("verification-code-requested", Connection = "ServiceBusConnection")]
         ServiceBusReceivedMessage message,
