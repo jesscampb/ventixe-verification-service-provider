@@ -33,4 +33,25 @@ public class VerificationService(VerificationDbContext context)
             return false;
         }
     }
+
+    public async Task<EmailRequestModel> GenerateVerificationCodeEmailAsync(string email)
+    {
+        var verificationCode = GenerateVerificationCode(email);
+        var result = await SaveVerificationCodeAsync(verificationCode);
+
+        if (result)
+        {
+            var emailRequest = new EmailRequestModel
+            {
+                Recipients = [email],
+                Subject = $"Verification Code: {verificationCode}",
+                PlainText = $"Your verification code is: {verificationCode}",
+                Html = $"<html><body><h1>Verification Code</h1><p>Here is your verification code:</p><p>{verificationCode}</p></body><html>"
+            };
+
+            return emailRequest;
+        }
+
+        return null!;
+    }
 }
