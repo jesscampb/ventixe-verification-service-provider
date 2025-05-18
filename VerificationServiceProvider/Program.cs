@@ -10,7 +10,7 @@ var builder = FunctionsApplication.CreateBuilder(args);
 
 builder.ConfigureFunctionsWebApplication();
 
-builder.Services.AddDbContext<VerificationDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("SqlConnection")));
+builder.Services.AddDbContext<VerificationDbContext>(x => x.UseSqlServer(Environment.GetEnvironmentVariable("SqlConnection")));
 
 builder.Services
     .AddApplicationInsightsTelemetryWorkerService()
