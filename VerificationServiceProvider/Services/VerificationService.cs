@@ -28,7 +28,7 @@ public class VerificationService(VerificationDbContext context)
         try
         {
             var entity = verificationCode.ToEntity();
-            _context.Add(entity);
+            _context.VerificationCodes.Add(entity);
             await _context.SaveChangesAsync();
             return true;
         }
@@ -48,9 +48,9 @@ public class VerificationService(VerificationDbContext context)
             var emailRequest = new EmailRequestModel
             {
                 Recipients = [email],
-                Subject = $"Verification Code: {verificationCode}",
-                PlainText = $"Your verification code is: {verificationCode}",
-                Html = $"<html><body><h1>Verification Code</h1><p>Here is your verification code:</p><p>{verificationCode}</p></body><html>"
+                Subject = $"Verification Code: {verificationCode.Code}",
+                PlainText = $"Your verification code is: {verificationCode.Code}",
+                Html = $"<html><body><h1>Verification Code</h1><p>Here is your verification code:</p><p>{verificationCode.Code}</p></body></html>"
             };
 
             return emailRequest;
@@ -69,7 +69,7 @@ public class VerificationService(VerificationDbContext context)
 
         if (entity != null)
         {
-            _context.Remove(entity);
+            _context.VerificationCodes.Remove(entity);
             await _context.SaveChangesAsync();
             return true;
         }
