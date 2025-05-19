@@ -26,5 +26,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Data\Databases\" />
+    <Folder Include="Mappers\" />
   </ItemGroup>
 </Project>
