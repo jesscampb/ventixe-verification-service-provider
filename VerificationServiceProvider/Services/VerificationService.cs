@@ -5,7 +5,7 @@ using VerificationServiceProvider.Models;
 
 namespace VerificationServiceProvider.Services;
 
-public class VerificationService(VerificationDbContext context)
+public class VerificationService(VerificationDbContext context) : IVerificationService
 {
     private static readonly Random _random = new();
     private readonly VerificationDbContext _context = context;
