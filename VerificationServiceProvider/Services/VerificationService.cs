@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VerificationServiceProvider.Data.Contexts;
+using VerificationServiceProvider.Mappers;
 using VerificationServiceProvider.Models;
 
 namespace VerificationServiceProvider.Services;
 
-public class VerificationService(VerificationDbContext context)
+public class VerificationService(VerificationDbContext context) : IVerificationService
 {
     private static readonly Random _random = new();
     private readonly VerificationDbContext _context = context;
@@ -15,6 +16,7 @@ public class VerificationService(VerificationDbContext context)
         {
             Email = email,
             Code = _random.Next(100000, 999999).ToString(),
+            CreatedAt = DateTime.UtcNow,
             ExpiresAt = DateTime.UtcNow.AddMinutes(expiresInMinutes)
         };
 
@@ -25,7 +27,8 @@ public class VerificationService(VerificationDbContext context)
     {
         try
         {
-            _context.Add(verificationCode);
+            var entity = verificationCode.ToEntity();
+            _context.VerificationCodes.Add(entity);
             await _context.SaveChangesAsync();
             return true;
         }
@@ -45,9 +48,9 @@ public class VerificationService(VerificationDbContext context)
             var emailRequest = new EmailRequestModel
             {
                 Recipients = [email],
-                Subject = $"Verification Code: {verificationCode}",
-                PlainText = $"Your verification code is: {verificationCode}",
-                Html = $"<html><body><h1>Verification Code</h1><p>Here is your verification code:</p><p>{verificationCode}</p></body><html>"
+                Subject = $"Verification Code: {verificationCode.Code}",
+                PlainText = $"Your verification code is: {verificationCode.Code}",
+                Html = $"<html><body><h1>Verification Code</h1><p>Here is your verification code:</p><p>{verificationCode.Code}</p></body></html>"
             };
 
             return emailRequest;
@@ -66,7 +69,7 @@ public class VerificationService(VerificationDbContext context)
 
         if (entity != null)
         {
-            _context.Remove(entity);
+            _context.VerificationCodes.Remove(entity);
             await _context.SaveChangesAsync();
             return true;
         }
