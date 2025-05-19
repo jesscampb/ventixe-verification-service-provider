@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VerificationServiceProvider.Data.Contexts;
+using VerificationServiceProvider.Mappers;
 using VerificationServiceProvider.Models;
 
 namespace VerificationServiceProvider.Services;
@@ -15,6 +16,7 @@ public class VerificationService(VerificationDbContext context)
         {
             Email = email,
             Code = _random.Next(100000, 999999).ToString(),
+            CreatedAt = DateTime.UtcNow,
             ExpiresAt = DateTime.UtcNow.AddMinutes(expiresInMinutes)
         };
 
@@ -25,7 +27,8 @@ public class VerificationService(VerificationDbContext context)
     {
         try
         {
-            _context.Add(verificationCode);
+            var entity = verificationCode.ToEntity();
+            _context.Add(entity);
             await _context.SaveChangesAsync();
             return true;
         }
