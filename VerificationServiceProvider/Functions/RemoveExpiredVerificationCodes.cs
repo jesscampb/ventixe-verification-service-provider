@@ -1,26 +1,37 @@
-using System;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using VerificationServiceProvider.Data.Contexts;
 
 namespace VerificationServiceProvider.Functions;
 
-public class RemoveExpiredVerificationCodes
+public class RemoveExpiredVerificationCodes(ILogger<RemoveExpiredVerificationCodes> logger, VerificationDbContext context)
 {
-    private readonly ILogger _logger;
-
-    public RemoveExpiredVerificationCodes(ILoggerFactory loggerFactory)
-    {
-        _logger = loggerFactory.CreateLogger<RemoveExpiredVerificationCodes>();
-    }
+    private readonly ILogger<RemoveExpiredVerificationCodes> _logger = logger;
+    private readonly VerificationDbContext _context = context;
 
     [Function("RemoveExpiredVerificationCodes")]
-    public void Run([TimerTrigger("0 0 0 * * *")] TimerInfo myTimer)
+
+    // Körs varje midnatt
+    public async Task Run([TimerTrigger("0 0 0 * * *", RunOnStartup = false)] TimerInfo timer)
     {
-        _logger.LogInformation("C# Timer trigger function executed at: {executionTime}", DateTime.Now);
-        
-        if (myTimer.ScheduleStatus is not null)
+        var now = DateTime.UtcNow;
+
+        _logger.LogInformation("RemoveExpiredVerificationCodes triggered at UTC {Time}", now);
+
+        var expired = await _context.VerificationCodes
+            .Where(x => x.ExpiresAt <= now)
+            .ToListAsync();
+
+        if (!expired.Any())
         {
-            _logger.LogInformation("Next timer schedule at: {nextSchedule}", myTimer.ScheduleStatus.Next);
+            _logger.LogInformation("No expired verification codes to remove.");
+            return;
         }
+
+        _context.VerificationCodes.RemoveRange(expired);
+        var count = await _context.SaveChangesAsync();
+
+        _logger.LogInformation("Removed {Count} expired verification codes.", count);
     }
 }
