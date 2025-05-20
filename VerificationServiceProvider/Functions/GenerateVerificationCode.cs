@@ -1,17 +1,15 @@
-using System;
-using System.Text.Json;
-using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 using VerificationServiceProvider.Services;
 
 namespace VerificationServiceProvider.Functions;
 
-public class GenerateVerificationCode(ILogger<GenerateVerificationCode> logger, VerificationService verificationService)
+public class GenerateVerificationCode(ILogger<GenerateVerificationCode> logger, IVerificationService verificationService)
 {
     private readonly ILogger<GenerateVerificationCode> _logger = logger;
-    private readonly VerificationService _verificationService = verificationService;
+    private readonly IVerificationService _verificationService = verificationService;
 
     [Function(nameof(GenerateVerificationCode))]
     [ServiceBusOutput("verification-email-requested", Connection = "ServiceBusConnection")]
