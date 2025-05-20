@@ -1,9 +1,7 @@
-using System;
-using System.Text.Json;
-using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 using VerificationServiceProvider.Services;
 
 namespace VerificationServiceProvider.Functions;
